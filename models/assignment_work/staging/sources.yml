@@ -1,6 +1,6 @@
 version: 2
 sources:
-  - name: raw_311_data
+  - name: nyc_hw3_raw_data
     description: Raw data loaded from NYC Open Data
     database: nicolemalescio-cis-9440
     schema: nyc_hw3_raw_data
