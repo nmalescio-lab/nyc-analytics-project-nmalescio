@@ -1,9 +1,9 @@
 version: 2
 sources:
-  - name: raw
+  - name: raw_311_data
     description: Raw data loaded from NYC Open Data
     database: nicolemalescio-cis-9440
-    schema: nyc_311_raw_data 
+    schema: nyc_hw3_raw_data
     tables:
       - name: source_dot_service_requests_history
         description: |
@@ -91,12 +91,12 @@ sources:
             description: Nearby landmark or point of interest
       version: 2
 sources:
-  - name: raw
+  - name: raw_restaurant_data
     description: Raw data loaded from NYC Open Data
-    database: YOUR-PROJECT-ID-HERE
-    schema: nyc_311_raw_data
+    database: nicolemalescio-cis-9440
+    schema: nyc_hw3_raw_data
     tables:
-      - name: source_dot_service_requests_history
+      - name: source_nyc_open_restaurant_apps
         description: |
           NYC 311 service requests for Dept of Transportation.
           One row per service request.
