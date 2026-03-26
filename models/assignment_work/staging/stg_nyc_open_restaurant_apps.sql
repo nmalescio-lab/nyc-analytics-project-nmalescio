@@ -50,8 +50,8 @@ cleaned AS (
 
         -- Request details
         CASE
-            WHEN REGEXP_CONTAINS(CAST(sta_serial_number AS STRING), r'[A-Za-z]') THEN NULL
-            ELSE CAST(TRIM(CAST(sta_serial_number AS STRING)) AS STRING)
+            WHEN REGEXP_CONTAINS(CAST(sla_serial_number AS STRING), r'[A-Za-z]') THEN NULL
+            ELSE CAST(TRIM(CAST(sla_serial_number AS STRING)) AS STRING)
         END AS sla_serial_number,
 
         -- Metadata
