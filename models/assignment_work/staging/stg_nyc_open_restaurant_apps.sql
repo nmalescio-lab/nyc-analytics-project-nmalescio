@@ -7,6 +7,7 @@ WITH source AS (
 
 cleaned AS (
     SELECT
+        -- Keep all other columns not being transformed
         * EXCEPT (
             objectid,
             globalid,
@@ -16,7 +17,15 @@ cleaned AS (
             street,
             business_address,
             zip,
-            sla_serial_number
+            sla_serial_number,
+            bin,
+            census_tract,
+            community_board,
+            council_district,
+            landmarkdistrict_terms,
+            latitude,
+            longitude,
+            nta
         ),
 
         -- Identifiers
@@ -39,6 +48,16 @@ cleaned AS (
         -- Address details
         CAST(INITCAP(TRIM(CAST(street AS STRING))) AS STRING) AS street,
         CAST(INITCAP(TRIM(CAST(business_address AS STRING))) AS STRING) AS business_address,
+
+        -- Location / geography fields
+        CAST(bin AS STRING) AS bin,
+        CAST(census_tract AS STRING) AS census_tract,
+        CAST(community_board AS STRING) AS community_board,
+        CAST(council_district AS STRING) AS council_district,
+        CAST(landmarkdistrict_terms AS STRING) AS landmarkdistrict_terms,
+        CAST(latitude AS NUMERIC) AS latitude,
+        CAST(longitude AS NUMERIC) AS longitude,
+        CAST(nta AS STRING) AS nta,
 
         -- Zip code cleaning
         CASE
@@ -65,15 +84,7 @@ deduplicated AS (
     FROM cleaned
     QUALIFY ROW_NUMBER() OVER (
         PARTITION BY objectid
-        ORDER BY
-            CASE WHEN bin IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN census_tract IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN community_board IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN council_district IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN landmarkdistrict_terms IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN latitude IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN longitude IS NOT NULL THEN 1 ELSE 0 END DESC,
-            CASE WHEN nta IS NOT NULL THEN 1 ELSE 0 END DESC
+        ORDER BY objectid
     ) = 1
 )
 
