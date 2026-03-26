@@ -63,7 +63,18 @@ cleaned AS (
 deduplicated AS (
     SELECT *
     FROM cleaned
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY objectid ORDER BY objectid) = 1
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY objectid
+        ORDER BY
+            CASE WHEN bin IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN census_tract IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN community_board IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN council_district IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN landmarkdistrict_terms IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN latitude IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN longitude IS NOT NULL THEN 1 ELSE 0 END DESC,
+            CASE WHEN nta IS NOT NULL THEN 1 ELSE 0 END DESC
+    ) = 1
 )
 
 SELECT * FROM deduplicated
