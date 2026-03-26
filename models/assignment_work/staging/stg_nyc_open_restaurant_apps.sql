@@ -16,7 +16,7 @@ cleaned AS (
             street,
             business_address,
             zip,
-            `SLA Serial Number`
+            sla_serial_number
         ),
 
         -- Identifiers
