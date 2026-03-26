@@ -1,13 +1,12 @@
--- Clean and standardize restaurant-related fields
--- One row per record
+-- Clean and standardize NYC open restaurant application data
+-- One row per application
 
 WITH source AS (
-    SELECT * FROM {{ source('raw', 'source_dot_service_requests_history') }}
-), -- Easier to refer to the dbt reference to a long name table this way
+    SELECT * FROM {{ source('raw', 'source_open_restaurant_apps') }}
+),
 
 cleaned AS (
     SELECT
-        -- Get all columns from source, except ones we're transforming below
         * EXCEPT (
             objectid,
             globalid,
@@ -64,10 +63,7 @@ cleaned AS (
 deduplicated AS (
     SELECT *
     FROM cleaned
-    QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY objectid
-        ORDER BY objectid
-    ) = 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY objectid ORDER BY objectid) = 1
 )
 
 SELECT * FROM deduplicated
