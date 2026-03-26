@@ -5,8 +5,21 @@ WITH source AS (
     SELECT * FROM {{ source('raw', 'source_nyc_open_restaurant_apps') }}
 ),
 
-final AS (
+cleaned AS (
     SELECT
+        * EXCEPT (
+            objectid,
+            globalid,
+            restaurant_name,
+            legal_business_name,
+            doing_business_as_dba,
+            street,
+            business_address,
+            zip,
+            sla_serial_number
+        ),
+
+        -- Identifiers
         CAST(objectid AS STRING) AS objectid,
         CAST(
             LOWER(
@@ -18,13 +31,16 @@ final AS (
             ) AS STRING
         ) AS globalid,
 
+        -- Restaurant details
         CAST(INITCAP(TRIM(CAST(restaurant_name AS STRING))) AS STRING) AS restaurant_name,
         CAST(INITCAP(TRIM(CAST(legal_business_name AS STRING))) AS STRING) AS legal_business_name,
         CAST(INITCAP(TRIM(CAST(doing_business_as_dba AS STRING))) AS STRING) AS doing_business_as_dba,
 
+        -- Address details
         CAST(INITCAP(TRIM(CAST(street AS STRING))) AS STRING) AS street,
         CAST(INITCAP(TRIM(CAST(business_address AS STRING))) AS STRING) AS business_address,
 
+        -- Zip code cleaning
         CASE
             WHEN TRIM(CAST(zip AS STRING)) = '' THEN NULL
             WHEN UPPER(TRIM(CAST(zip AS STRING))) IN ('N/A', 'NA') THEN NULL
@@ -32,23 +48,22 @@ final AS (
             ELSE NULL
         END AS zip,
 
-        CAST(bin AS STRING) AS bin,
-        CAST(census_tract AS STRING) AS census_tract,
-        CAST(community_board AS STRING) AS community_board,
-        CAST(council_district AS STRING) AS council_district,
-        CAST(landmarkdistrict_terms AS STRING) AS landmarkdistrict_terms,
-        CAST(latitude AS NUMERIC) AS latitude,
-        CAST(longitude AS NUMERIC) AS longitude,
-        CAST(nta AS STRING) AS nta,
-
+        -- Request details
         CASE
             WHEN REGEXP_CONTAINS(CAST(sla_serial_number AS STRING), r'[A-Za-z]') THEN NULL
             ELSE CAST(TRIM(CAST(sla_serial_number AS STRING)) AS STRING)
         END AS sla_serial_number,
 
+        -- Metadata
         CURRENT_TIMESTAMP() AS _stg_loaded_at
 
     FROM source
+),
+
+deduplicated AS (
+    SELECT *
+    FROM cleaned
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY objectid ORDER BY objectid) = 1
 )
 
-SELECT * FROM final
+SELECT * FROM deduplicated
