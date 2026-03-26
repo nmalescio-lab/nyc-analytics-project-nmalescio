@@ -89,7 +89,7 @@ sources:
             description: Y coordinate in NY State Plane projection system (NAD 83)
           - name: landmark
             description: Nearby landmark or point of interest
-      - name: source_dot_service_requests_history
+      - name: source_restaurant_apps_history
         description: |
           The NYC Open Restaurant dataset documents the city’s initiative to expand and track 
           outdoor dining options during a multi‑phase program designed to support restaurants 
