@@ -9,6 +9,7 @@ cleaned AS (
     SELECT
         -- Get all columns from source, except ones we're transforming below
         * EXCEPT (
+            objectid,
             globalid,
             restaurant_name,
             legal_business_name,
@@ -20,6 +21,7 @@ cleaned AS (
         ),
 
         -- Identifiers
+        CAST(objectid AS STRING) AS objectid,
         CAST(
             LOWER(
                 REGEXP_REPLACE(
@@ -57,6 +59,15 @@ cleaned AS (
         CURRENT_TIMESTAMP() AS _stg_loaded_at
 
     FROM source
+),
+
+deduplicated AS (
+    SELECT *
+    FROM cleaned
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY objectid
+        ORDER BY objectid
+    ) = 1
 )
 
-SELECT * FROM cleaned
+SELECT * FROM deduplicated
