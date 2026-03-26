@@ -2,7 +2,7 @@
 -- One row per application
 
 WITH source AS (
-    SELECT * FROM {{ source('raw', 'source_restaurant_apps_history') }}
+    SELECT * FROM {{ source('raw', 'source_nyc_open_restaurant_apps') }}
 ),
 
 cleaned AS (
