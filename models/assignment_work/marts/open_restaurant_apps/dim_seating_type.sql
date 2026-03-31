@@ -1,6 +1,6 @@
 -- Seating type dimension for open restaurant seating applications
 WITH seating_types AS (
-   SELECT
+   SELECT DISTINCT
        seating_interest_sidewalk AS seating_interest,
         CASE 
             WHEN approved_for_sidewalk_seating = "yes" THEN TRUE
